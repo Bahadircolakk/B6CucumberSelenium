@@ -1,3 +1,4 @@
+@smoke
 Feature: Navigate Menu with parameters
 
   Background:
