@@ -14,6 +14,7 @@ public class Driver {
 
     private Driver() {
     }
+
     private static WebDriver driver;
 
     public static WebDriver get() {
@@ -46,6 +47,11 @@ public class Driver {
                     if (!System.getProperty("os.name").toLowerCase().contains("mac"))
                         throw new WebDriverException("Your OS doesn't support Safari");
                     driver = new SafariDriver();
+                }
+                case "incognito"->{
+                    ChromeOptions options = new ChromeOptions();
+                    options.addArguments("--incognito");
+                    driver= new ChromeDriver(options);
                 }
             }
         }

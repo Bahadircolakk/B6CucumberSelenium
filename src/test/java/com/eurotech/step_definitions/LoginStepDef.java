@@ -2,14 +2,21 @@ package com.eurotech.step_definitions;
 
 import com.eurotech.pages.DashboardPage;
 import com.eurotech.pages.LoginPage;
+import com.eurotech.utilities.BrowserUtils;
 import com.eurotech.utilities.ConfigurationReader;
 import com.eurotech.utilities.Driver;
+import com.eurotech.utilities.ExcelUtil;
 import io.cucumber.java.en.*;
 import org.junit.Assert;
 
+import java.util.List;
 import java.util.Map;
 
 public class LoginStepDef {
+
+    String sheetName = "Test Data";
+    ExcelUtil excelUtil = new ExcelUtil("src/test/resources/EurotechTest.xlsx",sheetName);
+    List<Map<String, String>> dataList = excelUtil.getDataList();
 
     LoginPage loginPage = new LoginPage();
     DashboardPage dashboardPage = new DashboardPage();
@@ -83,4 +90,43 @@ public class LoginStepDef {
         String actualMessage= loginPage.getWarningMessage(expectedMessage);
         Assert.assertEquals(expectedMessage,actualMessage);
     }
+
+    @When("The user enters {string} and row number {int}")
+    public void theUserEntersAndRowNumberRowNumber(String sheetName, int rowNumber) {
+        ExcelUtil excelUtil = new ExcelUtil("src/test/resources/EurotechTest.xlsx",sheetName);
+        List<Map<String, String>> dataList = excelUtil.getDataList();
+        System.out.println("dataList.get(0) Username = " + dataList.get(0).get("Username"));
+        System.out.println("Gulcan's Password  " + dataList.get(2).get("Password"));
+        System.out.println("Seyit's Company  = " + dataList.get(4).get("Company"));
+
+
+        loginPage.login(dataList.get(rowNumber).get("Username"),dataList.get(rowNumber).get("Password"));
+    }
+
+    @Then("The welcome message contains excel {string} and {int}")
+    public void theWelcomeMessageContainsExcelAndRowNumberForName(String sheetName,int rowNumberForName) {
+
+        ExcelUtil excelUtil = new ExcelUtil("src/test/resources/EurotechTest.xlsx",sheetName);
+        List<Map<String, String>> dataList = excelUtil.getDataList();
+
+        String actualMessage = dashboardPage.welcomeMessage.getText();
+        Assert.assertTrue(actualMessage.contains(dataList.get(rowNumberForName).get("Name")));
+
+    }
+
+    @Then("The user verify that company name {int}")
+    public void the_user_verify_that_company_name(Integer rowNumberForCompany) {
+
+
+        //1 way
+        String actualCompanyName= dashboardPage.getCompanyName(dataList.get(rowNumberForCompany).get("Company"));
+        //   Assert.assertEquals(dataList.get(rowNumberForCompany).get("Company"),actualCompanyName);
+
+        //2 way
+        //  String actualCompanyName= dashboardPage.companyName.getText();
+        Assert.assertEquals(dataList.get(rowNumberForCompany).get("Company"),actualCompanyName);
+
+
+    }
+
 }
